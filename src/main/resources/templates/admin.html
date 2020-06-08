@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>어드민</title>
+
+    <!--부트스트랩 css 추가-->
+    <link rel="stylesheet" href="/css/lib/bootstrap.min.css">
+</head>
+<body>
+    <h1>어드민 페이지입니다.</h1>
+    <hr>
+    <a th:href="@{'/'}">메인으로 이동</a>
+
+    <br/>
+    <button sec:authorize="hasRole('ROLE_ADMIN')" type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+            data-target="#saveBooksModal">책 등록</button>
+
+    <button sec:authorize="hasRole('ROLE_ADMIN')" type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+            data-target="#deleteBooksModal">책 제거</button>
+
+    <button sec:authorize="hasRole('ROLE_ADMIN')" type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+            data-target="#updateBooksModal">책 정보 수정</button>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- 목록 출력 영역 -->
+            <table class="table table-horizontal table-bordered" id="table-list">
+                <thead class="thead-strong">
+                <tr>
+                    <th width="15%">ID</th>
+                    <th width="15%">종류</th>
+                    <th width="30%">제목</th>
+                    <th width="15%">작가</th>
+                    <th width="10%">개수</th>
+                    <th width="15%">가격</th>
+                </tr>
+                </thead>
+
+                <tbody id="tbodyBooks">
+                <tr th:each="obj: ${books}">
+                    <td th:id="'td-id' + ${obj.id}" th:text="${obj.id}"></td>
+                    <td th:id="'td-kinds' + ${obj.id}" th:text="${obj.kinds}"></td>
+                    <td th:id="'td-title' + ${obj.id}" th:text="${obj.title}"></td>
+                    <td th:id="'td-author' + ${obj.id}" th:text="${obj.author}"></td>
+                    <td th:id="'td-counts' + ${obj.id}" th:text="${obj.counts} +'개'"></td>
+                    <td th:id="'td-price' + ${obj.id}" th:text="${obj.price} +'원'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!--csrf 토큰 -->
+    <input type="hidden" id="csrf-token" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <!-- Modal 영역 -->
+    <!-- 책 등록-->
+    <div class="modal fade" id="saveBooksModal" tabindex="-1" role="dialog" aria-labelledby="saveBooksLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="saveBooksLabel">등록</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="kinds">종류</label>
+                            <input type="text" class="form-control" id="kinds" placeholder="종류를 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="title"> 제목 </label>
+                            <input type="text" class="form-control" id="title" placeholder="제목을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="author"> 작가 </label>
+                            <input type="text" class="form-control" id="author" placeholder="작가를 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="counts"> 개수 </label>
+                            <input type="text" class="form-control" id="counts" placeholder="숫자만 입력해주세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="price"> 가격 </label>
+                            <input type="text" class="form-control" id="price" placeholder="숫자만 입력해주세요">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="btn-save">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--책 제거-->
+    <div class="modal fade" id="deleteBooksModal" tabindex="-1" role="dialog" aria-labelledby="deleteMaterialsLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteMaterialsLabel">제거</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label>ID</label>
+                            <input type="text" class="form-control" id="deleteId" placeholder="삭제할 책의 ID를 입력하세요">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="btn-delete">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 책 정보 수정-->
+    <div class="modal fade" id="updateBooksModal" tabindex="-1" role="dialog" aria-labelledby="updateBooksLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateBooksLabel">등록</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="kinds">수정할 책 id</label>
+                            <input type="text" class="form-control" id="update_id" placeholder="정보를 수정할 책의 id를 입력해주세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="kinds">종류</label>
+                            <input type="text" class="form-control" id="update_kinds" placeholder="종류를 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="title"> 제목 </label>
+                            <input type="text" class="form-control" id="update_title" placeholder="제목을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="author"> 작가 </label>
+                            <input type="text" class="form-control" id="update_author" placeholder="작가를 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="counts"> 개수 </label>
+                            <input type="text" class="form-control" id="update_counts" placeholder="숫자만 입력해주세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="price"> 가격 </label>
+                            <input type="text" class="form-control" id="update_price" placeholder="숫자만 입력해주세요">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="btn-update">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--부트스트랩 js, jquery 추가-->
+    <script src="/js/lib/jquery.min.js"></script>
+    <script src="/js/lib/bootstrap.min.js"></script>
+
+    <!--custom js 추가-->
+    <script src="/js/app/admin.js"></script>
+
+</body>
+</html>

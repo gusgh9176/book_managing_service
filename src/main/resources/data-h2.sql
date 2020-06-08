@@ -1,0 +1,1 @@
+insert into books (kinds, title, author, counts, price, created_date, modified_date) value ('테스트 종류', '테스트 타이틀', '테스트 작가', 1, 1000, now(), now());
