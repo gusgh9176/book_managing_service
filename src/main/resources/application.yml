@@ -1,7 +1,7 @@
 spring:
   profiles:
-    active: local # 기본 환경 선택
-
+    active: deploy
+#    active: local # 기본 환경 선택
 # local 환경
 ---
 spring:
@@ -20,3 +20,31 @@ spring:
     username: test # 사용자 이름
     password: 1234 # 사용자 암호
 #    data: classpath:data-h2.sql # 시작할 때 실행시킬 script
+
+# deploy 환경
+---
+spring:
+  profiles: deploy
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/bookmanage?serverTimezone=UTC&characterEncoding=UTF-8
+    username: bookmanager
+    password: 1234
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: update
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+server:
+  port: 8080
